@@ -1,11 +1,14 @@
 const container=document.getElementById('container');
+const resize = document.getElementById('resize');
+const clear = document.getElementById('clear');
+const eraser = document.getElementById('eraser');
+const random = document.getElementById('random');
+const pen = document.getElementById('pen');
 let BOARD_SIZE=16;
 let randomColor  =() =>  Math.floor(Math.random()*16777215).toString(16);
 let currentPenStyle = "black";
 function initialize(){
-    const grid=document.createElement('div');
-    grid.setAttribute('id', 'grid');
-    container.appendChild(grid);
+    const grid=document.getElementById('grid');
     for(let i=0; i<BOARD_SIZE;i++){
         
         const row=document.createElement('div');
@@ -22,7 +25,6 @@ function initialize(){
     }
     
 }
-
 //delete the squares for the new size
 function trimBoard(newSize){
     for(let i=BOARD_SIZE-1;i>=(newSize);i--){
@@ -36,7 +38,6 @@ function trimBoard(newSize){
         })
     }
 }
-
 //function that adds the right squares to the grid
 function expandBoard(newSize){
     //change the rows already there
@@ -50,7 +51,6 @@ function expandBoard(newSize){
             addPenStyle(square, currentPenStyle);
         }
     }
-
     // change adding new rows
     const grid=document.getElementById('grid');
     for(let i=BOARD_SIZE;i<newSize; i++){
@@ -67,8 +67,7 @@ function expandBoard(newSize){
         grid.appendChild(row);
     }
 }
-
-//resize button function
+//resize button functionconst eraser = document.getElementById('eraser');
 function resizeBoard(){
     let newSize=parseInt(prompt("how big do you want the grid to be?"));
     newSize= (newSize>100)? 100:newSize;
@@ -77,48 +76,40 @@ function resizeBoard(){
     const squares = document.querySelectorAll('.square');
     clearBoard();
 }
-function clearBoard(){
-
+//apply a callback to all squares
+function applyToAllSquares(callBack){
     for(let i=0;i<BOARD_SIZE;i++){
         const squares=document.querySelectorAll('#col-'+i);
         squares.forEach((square)=>{
-            square.style.background='white';
+            callBack(square);
         });
     }
 }
-
-function addPenStyle(square, color){
+//clears the board
+function clearBoard(){
+    applyToAllSquares((square)=>square.style.background='white');
+}
+//adds a listener to a single square
+function addPenStyle(square){
     square.addEventListener("mouseenter", (e)=>{
-        e.target.style.background = (color=="random")?("#" + randomColor()):color;
+        e.target.style.background = (currentPenStyle=="random")?("#" + randomColor()):currentPenStyle;
     });
 }
+
 function changePenStyle(color){
-    for(let i=0;i<BOARD_SIZE;i++){
-        const squares=document.querySelectorAll('#col-'+i);
-        squares.forEach((square)=>{
-            console.log("changing to "+color);
-            addPenStyle(square, color);
-        });
-    }
     currentPenStyle=color;
+    applyToAllSquares(addPenStyle);
 }
 
-
 initialize();
-
 //resize button 
-const resize = document.getElementById('resize');
+
 resize.addEventListener('click', resizeBoard);
 //clear
-const clear = document.getElementById('clear');
 clear.addEventListener('click', clearBoard);
-
-const eraser = document.getElementById('eraser');
+//set pen color to white
 eraser.addEventListener('click', ()=>changePenStyle("white"));
-
-const random = document.getElementById('random');
+//set pen color to random
 random.addEventListener('click', ()=>changePenStyle("random"));
-
-const pen = document.getElementById('pen');
+//set pen color to black
 pen.addEventListener('click', ()=>changePenStyle("black"));
-
